@@ -33,6 +33,7 @@ export type DelegatedProps = {|
     xhr: XMLHttpRequest,
   }) => mixed,
   render: RenderProps => React.Node,
+  clearUploadsOnSuccess?: boolean
 |}
 
 type Props = {
@@ -50,6 +51,7 @@ type State = {|
 class DirectUploadProvider extends React.Component<Props, State> {
   static defaultProps = {
     origin: {},
+    clearUploadsOnSuccess: true
   }
 
   state = {
@@ -93,7 +95,11 @@ class DirectUploadProvider extends React.Component<Props, State> {
 
     this.props.onSuccess(signedIds)
     this.uploads = []
-    this.setState({ fileUploads: {}, uploading: false })
+    this.setState({ uploading: false })
+    
+    if (this.props.clearUploadsOnSuccess) {
+      this.setState({ fileUploads: [] })
+    }
   }
 
   handleChangeFileUpload = (fileUpload: {
