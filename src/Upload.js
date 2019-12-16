@@ -6,7 +6,7 @@
  */
 
 import * as ActiveStorage from 'activestorage'
-import { compactObject } from './helpers'
+import { buildUrl, compactObject } from './helpers'
 
 import type { ActiveStorageFileUpload, Origin, CustomHeaders } from './types'
 
@@ -56,19 +56,9 @@ class Upload {
   }
 
   get directUploadsUrl(): string {
-    const {
-      origin: { host, protocol, port },
-      directUploadsPath,
-    } = this.options
+    const { origin, directUploadsPath } = this.options
 
-    if (host) {
-      const builtProtocol = protocol
-        ? `${protocol.split(':')[0]}://`
-        : 'https://'
-      const builtPort = port ? `:${port}` : ''
-      return `${builtProtocol}${host}${builtPort}${directUploadsPath}`
-    }
-    return directUploadsPath
+    return buildUrl({ ...origin, path: directUploadsPath })
   }
 
   handleChangeFile = (upload: ActiveStorageFileUpload) => {
@@ -91,6 +81,7 @@ class Upload {
       state: 'finished',
       id: this.id,
       file: this.directUpload.file,
+      result
     })
     return result
   }
